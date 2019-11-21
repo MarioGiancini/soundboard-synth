@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Soundboard Synth</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+	<style type="text/css">
+		:root {
+			--black: #050505;
+			--gray-100: #191919;
+			--gray-200: #222222;
+			--gray-300: #333333;
+			--gray-400: #444444;
+			--gray-500: #555555;
+			--gray-600: #696969;
+			--gray-700: #8e8e8e;
+			--gray-800: #AFAFAF;
+			--gray-900: #DEDEDE;
+			--primary: #00d1b2;
+
+			--key-width: 38px;
+			--key-width-short: 28px;
+			--padding: 1.25em;
+		}
+
+		.panel a, .modal a {
+			color: var(--gray-700);
+			transition: color .1s ease;
+		}
+
+		.flex {
+			display: flex;
+		}
+
+		.container .panel {
+			background-color: var(--gray-100);
+			border-radius: 0;
+		}
+
+		.panel.is-primary .panel-heading {
+			border-radius: 0;
+			font-weight: 400;
+			display: flex;
+			align-items: center;
+		}
+
+		.panel.is-primary .panel-heading .app-title {
+			flex: 1;
+			font-weight: 300;
+			background: -webkit-linear-gradient(180deg, var(--primary), var(--gray-100));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			letter-spacing: 10px;
+			text-transform: uppercase;
+		}
+
+		.panel.is-primary .panel-heading .app-version {
+			color: var(--gray-300);
+			font-size: .5em;
+		}
+
+		.panel .panel-block {
+			padding: var(--padding);
+			position: relative;
+		}
+
+		.panel .panel-block:before {
+			color: var(--gray-400);
+			font-size: 75%;
+			letter-spacing: 5px;
+			position: absolute;
+			text-transform: uppercase;
+			top: -2px;
+		}
+
+		#controls:before {
+			content: "Global Controls";
+		}
+
+		#mapper:before {
+			content: "Key Mapping"
+		}
+
+		.panel .panel-block .field {
+			margin-bottom: 0;
+		}
+
+		.panel .panel-block:not(:last-child), .panel .panel-tabs:not(:last-child) {
+			border-bottom-color: var(--gray-300);
+		}
+
+		button {
+			font-weight: 700;
+			transition: background-color .1s ease, color .1s ease;
+		}
+
+		button.is-primary.is-outlined:hover,
+		button.is-primary.is-outlined:active,
+		button.is-primary.is-outlined:focus {
+			color: var(--gray-100) !important;
+		}
+
+		.keyboard {
+			width: 100%;
+			background-color: var(--gray-100);
+			margin: 0 auto;
+			color: var(--gray-800);
+		}
+
+		.keyboard, .keyboard * {
+			box-sizing: initial;
+		}
+
+		.lights {
+			float: right;
+			position: relative;
+			top: -45px;
+			right: 8px;
+			padding: 0;
+			margin: 0;
+		}
+
+		.lights span {
+			margin: 0 20px 0 20px;
+			padding: 0;
+			text-align: center;
+		}
+
+		.lights span:after {
+			content: "";
+			width: 11px;
+			height: 8px;
+			top: 22px;
+			margin-left: -9px;
+			background-color: #DBB921;
+			position: absolute;
+			border-radius: 3px;
+		}
+
+		.key {
+			width: var(--key-width);
+			height: var(--key-width);
+			display: block;
+			background-color: var(--gray-300);
+			text-align: left;
+			padding-left: 8px;
+			line-height: 29px;
+			border-radius: 2px;
+			border: 1px solid transparent;
+			float: left;
+			margin-left: 2px;
+			margin-bottom: 2px;
+			cursor: pointer;
+			position: relative;
+			transition: box-shadow 0.1s ease;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
+		.key.disabled {
+			background-color: var(--gray-200);
+			color: var(--gray-500);
+			cursor: default;
+		}
+
+		.key:not(.disabled):hover {
+			box-shadow: 0 0 10px var(--primary);
+			color: var(--primary);
+			z-index: 1000;
+		}
+
+		.key.tap {
+			border-color: var(--primary);
+			color: var(--primary);
+		}
+
+		.key.mapped {
+			background-color: var(--gray-400);
+		}
+
+		.key.mapped:after {
+			color: var(--gray-200);
+			content: "•";
+			position: absolute;
+			bottom: -6px;
+			right: 3px;
+			text-shadow: 0 0 1px var(--gray-600);
+		}
+
+		.key.mapped.tap:after {
+			color: var(--primary);
+		}
+
+		.section-a {
+			width: 614px;
+		}
+
+		.section-b {
+			width: 150px;
+			height: 260px;
+			float: left;
+		}
+
+		.function {
+			font-size: 12px;
+			width: var(--key-width-short);
+			height: var(--key-width-short);
+			margin-bottom: 15px;
+		}
+
+		.small {
+			font-size: 10px;
+			line-height: 13px;
+			text-align: center;
+			padding: 2px 5px 0;
+			height: 28px !important;
+		}
+
+		.space1 {
+			margin-right: 43px !important;
+		}
+
+		.space2 {
+			margin-right: 25px !important;
+		}
+
+		.dual {
+			font-size: 14px;
+			line-height: 20px;
+			width: var(--key-width-short);
+		}
+
+		.backspace {
+			width: 82px;
+			font-size: 12px;
+		}
+
+		.tab {
+			width: 48px;
+			line-height: var(--key-width);
+			font-size: 13px;
+		}
+
+		.letter, .arrow, .opt {
+			width: var(--key-width-short);
+		}
+
+		.slash {
+			width: 62px;
+		}
+
+		.caps {
+			width: 68px;
+			font-size: 12px;
+			line-height: 18px;
+		}
+
+		.enter {
+			width: 90px;
+			line-height: var(--key-width);
+			text-align: center;
+			padding-left: 0;
+		}
+
+		.shift.left {
+			width: 88px;
+			line-height: var(--key-width);
+			font-size: 13px;
+		}
+
+		.shift.right {
+			width: 102px;
+			line-height: var(--key-width);
+			font-size: 13px;
+		}
+
+		.ctrl {
+			line-height: var(--key-width);
+			font-size: 13px;
+		}
+
+		.space {
+			width: 212px;
+		}
+
+		.sec-func .key {
+			width: 32px;
+			font-size: 10px;
+			text-align: left;
+			line-height: var(--key-width);
+			float: left;
+		}
+
+		.sec-func div.dual {
+			line-height: 20px;
+		}
+
+		.arrows .key {
+			text-align: center;
+			padding-left: 7px;
+			margin-left: 2px;
+		}
+
+		.hidden {
+			visibility: hidden;
+		}
+
+		.field .select select, .panel-block:last-child {
+			background-color: transparent;
+			color: var(--gray-600);
+		}
+
+		.select select {
+			width: 100%;
+		}
+
+		.control {
+			line-height: 1;
+		}
+
+		.control-display {
+			margin-bottom: 5px;
+		}
+
+		.slider {
+			-webkit-appearance: none;
+			width: 100%;
+			height: 20px;
+			background-color: var(--gray-300);
+			outline: none;
+			-webkit-transition: background-color .2s ease;
+			transition: background-color .2s ease;
+		}
+
+		.slider:hover {
+			background-color: var(--gray-400);
+		}
+
+		.slider::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			appearance: none;
+			width: 20px;
+			height: 20px;
+			background: var(--primary);
+			cursor: pointer;
+		}
+
+		.slider::-moz-range-thumb {
+			width: 25px;
+			height: 25px;
+			background: var(--primary);
+			cursor: pointer;
+		}
+
+		/* The switch - the box around the slider */
+		.switch {
+			position: relative;
+			display: inline-block;
+			opacity: 0.75;
+			width: 60px !important;
+			height: 40px;
+		}
+
+		/* Hide default HTML checkbox */
+		.switch input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		/* The slider */
+		.toggle {
+			position: absolute;
+			cursor: pointer;
+			width: 100%;
+			height: 20px;
+			left: 0;
+			top: 18px;
+			background-color: var(--gray-300);
+			-webkit-transition: .4s;
+			transition: .4s;
+		}
+
+		.toggle:before {
+			position: absolute;
+			content: "";
+			height: 20px;
+			width: 30px;
+			left: 0;
+			bottom: 0;
+			background-color: var(--gray-600);
+			-webkit-transition: .4s;
+			transition: .4s;
+		}
+
+		input:checked + .toggle:before {
+			background-color: var(--primary);
+		}
+
+		input:checked + .toggle:before {
+			-webkit-transform: translateX(30px);
+			-ms-transform: translateX(30px);
+			transform: translateX(30px);
+		}
+
+		.toggle:hover {
+			background-color: var(--gray-400);
+		}
+
+		#mapper > *, #controls > *, #message {
+			flex: 1;
+			margin-right: 10px;
+		}
+
+		#mapper > *:last-child, #controls > *:last-child {
+			margin-right: 0;
+		}
+
+		#info, #stop, #checkSounds, #sample {
+			flex: 0;
+		}
+
+		#speedAllSwitch, #retriggerSwitch {
+			flex: none;
+		}
+
+		/* The Modal (background) */
+		.modal {
+			color: var(--gray-800);
+			display: none;
+			position: fixed;
+			z-index: 40;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0,0,0);
+			background-color: rgba(0,0,0,0.4);
+			-webkit-animation-name: fadeIn;
+			-webkit-animation-duration: 0.4s;
+			animation-name: fadeIn;
+			animation-duration: 0.4s
+		}
+
+		/* Modal Content */
+		.modal-content {
+			position: fixed;
+			bottom: 0;
+			background-color: var(--gray-300);
+			margin: 0;
+			max-height: initial;
+			width: 100%;
+			-webkit-animation-name: slideIn;
+			-webkit-animation-duration: 0.4s;
+			animation-name: slideIn;
+			animation-duration: 0.4s
+		}
+
+		/* The Close Button */
+		.close {
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+			line-height: 1;
+			transition: color .1s ease;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: var(--gray-600);
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			background-color: var(--primary);
+			color: var(--gray-100);
+			font-size: 20px;
+			padding: 4px var(--padding);;
+		}
+
+		.modal-body {
+			font-size: 80%;
+			padding: 20px var(--padding);;
+		}
+
+		.modal-body h3 {
+			font-size: 100%;
+			font-weight: 700;
+			border-bottom: 1px solid;
+			margin-bottom: 10px;
+		}
+
+		.modal-body a {
+			color: var(--gray-900);
+			font-weight: 700;
+		}
+
+		.modal-body strong {
+			color: var(--primary);
+		}
+
+		.modal-body ol, .modal-body ul {
+			margin-left: 20px;
+		}
+
+		.modal-body ul {
+			list-style: disc;
+		}
+
+		.modal-footer {
+			background-color: var(--gray-200);
+			color: var(--gray-500);
+			font-size: 14px;
+			line-height: 1;
+			padding: 10px var(--padding);
+		}
+
+		/* Add Animation */
+		@-webkit-keyframes slideIn {
+			from {bottom: -400px; opacity: 0}
+			to {bottom: 0; opacity: 1}
+		}
+
+		@keyframes slideIn {
+			from {bottom: -400px; opacity: 0}
+			to {bottom: 0; opacity: 1}
+		}
+
+		@-webkit-keyframes fadeIn {
+			from {opacity: 0}
+			to {opacity: 1}
+		}
+
+		@keyframes fadeIn {
+			from {opacity: 0}
+			to {opacity: 1}
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+
+	<div id="resources"></div>
+	<article class="panel is-primary">
+		<div class="panel-heading">
+			<span class="app-title">Soundboard Synth</span>
+			<span class="app-version">v1.0.0</span>
+		</div>
+		<div class="panel-block" id="keyboard">
+			<div class="keyboard">
+				<div class="section-a">
+					<div class="function-row" style="display: none;">
+						<div data-code="27" class="key function space1">
+							Esc
+						</div>
+
+						<div data-code="112" class="key function">
+							F1
+						</div>
+						<div data-code="113" class="key function">
+							F2
+						</div>
+						<div data-code="114" class="key function">
+							F3
+						</div>
+
+						<div data-code="115" class="key function space2">
+							F4
+						</div>
+						<div data-code="116" class="key function">
+							F5
+						</div>
+						<div data-code="117" class="key function">
+							F6
+						</div>
+						<div data-code="118" class="key function">
+							F7
+						</div>
+						<div data-code="119" class="key function space2">
+							F8
+						</div>
+
+						<div data-code="120" class="key function">
+							F9
+						</div>
+						<div data-code="121" class="key function">
+							F10
+						</div>
+						<div data-code="122" class="key function">
+							F11
+						</div>
+						<div data-code="123" class="key function">
+							F12
+						</div>
+						<!--END FUNCTION KEYS -->
+					</div>
+
+					<div data-code="192" class="key num dual">
+						~<br>`
+					</div>
+
+					<div data-code="49" class="key num dual">
+						!<br>1
+					</div>
+					<div data-code="50" class="key num dual">
+						@<br>2
+					</div>
+					<div data-code="51" class="key num dual">
+						#<br>3
+					</div>
+					<div data-code="52" class="key num dual">
+						$<br>4
+					</div>
+					<div data-code="53" class="key num dual">
+						%<br>5
+					</div>
+					<div data-code="54" class="key num dual">
+						^<br>6
+					</div>
+					<div data-code="55" class="key num dual">
+						&<br>7
+					</div>
+					<div data-code="56" class="key num dual">
+						*<br>8
+					</div>
+					<div data-code="57" class="key num dual">
+						(<br>9
+					</div>
+					<div data-code="48" class="key num dual">
+						)<br>0
+					</div>
+					<div data-code="189" class="key num dual disabled">
+						_<br>-
+					</div>
+					<div data-code="187" class="key num dual disabled">
+						+<br>=
+					</div>
+					<div data-key="Backspace" data-code="8" class="key backspace disabled">
+						Backspace
+					</div>
+					<!--END NUMBER KEYS -->
+
+					<div data-key="Tab" data-code="9" class="key tab disabled">
+						Tab
+					</div>
+
+					<div data-code="81" class="key letter">
+						Q
+					</div>
+					<div data-code="87" class="key letter">
+						W
+					</div>
+					<div data-code="69" class="key letter">
+						E
+					</div>
+					<div data-code="82" class="key letter">
+						R
+					</div>
+					<div data-code="84" class="key letter">
+						T
+					</div>
+					<div data-code="89" class="key letter">
+						Y
+					</div>
+					<div data-code="85" class="key letter">
+						U
+					</div>
+					<div data-code="73" class="key letter">
+						I
+					</div>
+					<div data-code="79" class="key letter">
+						O
+					</div>
+					<div data-code="80" class="key letter">
+						P
+					</div>
+					<div data-code="219" class="key dual">
+						{<Br>[
+					</div>
+					<div data-code="221" class="key dual">
+						}<br>]
+					</div>
+					<div data-code="220" class="key letter dual slash">
+						|<br>\
+					</div>
+					<div data-code="20" class="key caps disabled">
+						Caps<br>Lock
+					</div>
+					<div data-code="65" class="key letter">
+						A
+					</div>
+					<div data-code="83" class="key letter">
+						S
+					</div>
+					<div data-code="68" class="key letter">
+						D
+					</div>
+					<div data-code="70" class="key letter">
+						F
+					</div>
+					<div data-code="71" class="key letter">
+						G
+					</div>
+					<div data-code="72" class="key letter">
+						H
+					</div>
+					<div data-code="74" class="key letter">
+						J
+					</div>
+					<div data-code="75" class="key letter">
+						K
+					</div>
+					<div data-code="76" class="key letter">
+						L
+					</div>
+					<div data-code="186" class="key dual">
+						:<br>;
+					</div>
+					<div data-code="222" class="key dual">
+						"<br>'
+					</div>
+					<div data-code="13" class="key enter disabled">
+						Enter
+					</div>
+
+					<div data-code="16" class="key shift left disabled">
+						Shift
+					</div>
+					<div data-code="90" class="key letter">
+						Z
+					</div>
+					<div data-code="88" class="key letter">
+						X
+					</div>
+					<div data-code="67" class="key letter">
+						C
+					</div>
+					<div data-code="86" class="key letter">
+						V
+					</div>
+					<div data-code="66" class="key letter">
+						B
+					</div>
+					<div data-code="78" class="key letter">
+						N
+					</div>
+					<div data-code="77" class="key letter">
+						M
+					</div>
+					<div data-code="188" class="key dual">
+						< <br>,
+					</div>
+					<div data-code="190" class="key dual">
+						><br>.
+					</div>
+					<div data-code="191" class="key dual">
+						?<br>/
+					</div>
+					<div data-code="16" class="key shift right disabled">
+						Shift
+					</div>
+					<div data-code="17" class="key ctrl disabled">
+						Ctrl
+					</div>
+					<div data-code="18" class="key opt disabled">
+						&hearts;
+					</div>
+					<div data-code="91" class="key alt disabled">
+						Alt
+					</div>
+					<div data-code="32" class="key space disabled">
+
+					</div>
+					<div data-code="91" class="key alt disabled">
+						Alt
+					</div>
+					<div data-code="18" class="key opt disabled">
+						&hearts;
+					</div>
+					<div data-code="37" class="key arrow disabled">
+						&#9664;
+					</div>
+					<div data-code="38" class="key arrow disabled">
+						&#9650;
+					</div>
+					<div data-code="40" class="key arrow disabled">
+						&#9660;
+					</div>
+					<div data-code="39" class="key arrow disabled">
+						&#9654;
+					</div>
+				</div><!-- end section-a-->
+			</div>
+		</div>
+		<div class="panel-block" id="controls">
+			<label for="speed" class="control has-text-light">
+				<span class="control-display is-flex">
+					<small style="flex: 1;">Playback Speed: </small>
+					<small class="has-text-primary"><span id="speedOutput">0</span>X</small>
+				</span>
+				<input class="slider" id="speed" name="speed" type="range" value="1" min=".25" max="4" step=".25">
+			</label>
+			<label class="control has-text-light switch" id="speedAllSwitch" title="Lock All Sounds Playing To Speed">
+				<span class="control-display is-flex">
+					<small>Follow</small>
+				</span>
+				<input type="checkbox" id="speedAll" name="speedAll">
+				<span class="toggle"></span>
+			</label>
+			<button id="stop" class="button is-primary is-outlined" title="Stop All Sounds"> &#9724; </button>
+			<button id="checkSounds" class="button is-primary is-outlined">Check For Sounds</button>
+			<!-- Trigger/Open The Modal -->
+			<button id="info" class="button is-primary is-outlined is-fullwidth" title="Help / Info"> ? </button>
+		</div>
+		<div class="panel-block" id="mapper">
+			<div class="field">
+				<div class="control">
+					<label class="select is-primary has-light-text">
+						<select name="sounds" id="sounds">
+							<option value="" disabled>Check For Sounds</option>
+						</select>
+					</label>
+				</div>
+			</div>
+			<button id="sample" class="button is-primary is-outlined" title="Play Selected Sound"> &#9658; </button>
+			<label class="control has-text-light switch" id="retriggerSwitch" title="When on mapped sound will retrigger on play. Turn off to play multiple copies.">
+				<span class="control-display is-flex">
+					<small>Retrigger</small>
+				</span>
+				<input type="checkbox" id="retrigger" name="retrigger">
+				<span class="toggle"></span>
+			</label>
+			<label for="start" style="line-height: 1;" class="has-text-light">
+				<span class="is-flex" style="margin-bottom: 5px;">
+					<small style="flex: 1;">Start Delay: </small>
+					<small class="has-text-primary"><span id="startOutput">0</span>%</small>
+				</span>
+				<input class="slider" id="start" name="start" type="range" value="0" min="0" max="100">
+			</label>
+			<button id="mapKey" class="button is-primary is-outlined is-fullwidth">Map To Key</button>
+		</div>
+        <div class="panel-block" style="justify-content: space-evenly;">
+			<small id="message">Ready...</small>
+		</div>
+
+	</article>
+</div>
+<!-- Info Modal -->
+<div id="myModal" class="modal">
+
+	<!-- Modal content -->
+	<div class="modal-content">
+		<div class="modal-header">
+			<span class="close">&times;</span>
+			<h2 class="is-uppercase">Info / Help</h2>
+		</div>
+		<div class="modal-body">
+			<h3>Getting Started With Soundboard Synth:</h3>
+			<ol>
+				<li>Click <strong>Check For Sounds</strong> to see if the current open tab has any audio files.</li>
+				<li>Let any found audio files load (whisper sweet nothings to your computer, it helps with load time).</li>
+				<li>Select an available file from the dropdown.</li>
+				<li>Set playback start delay for optimal sample chopping.</li>
+				<li>Click <strong>Map To Key</strong> to map the sound to a key on your keyboard
+					(<em>unavailable</em> keys will be darkened out, <em>mapped</em> keys will be lighter in color) .
+				</li>
+				<li>Repeat until your are satisfied with your key mapping.</li>
+				<li>Smash your keyboard for optimal sonic delight (you can also click keys on the visual keyboard).</li>
+				<li><strong>+</strong> and <strong>-</strong> keys increase and decrease playback speed,
+					and the <strong>&#9664;</strong> and <strong>&#9654;</strong> adjust the play start delay.</li>
+			</ol>
+			<br>
+			<h3>More Things:</h3>
+			<p>Feeling generous? <a href="#">Buy me some coffee</a>. Cheers!</p>
+			<p>Visit <a href="https://soundboardsynth.com">https://soundboardsynth.com</a> for more info and support.</p>
+		</div>
+		<div class="modal-footer">
+			<small class="credits">Made with &hearts; by <a href="https://twitter.com/MarioGiancini">Mario Giancini</a></small>
+		</div>
+	</div>
+
+</div>
+
+<!-- load JS, order matters -->
+<script src="switcher.js"></script>
+<script src="soundboard.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
