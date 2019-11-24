@@ -24,14 +24,18 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         // Get currently stored sound files and key mappings by unique url
         // Do storage of update within callback of get request
         chrome.storage.local.get([request.url], function(result) {
-            if (typeof result[request.url] !== 'undefined' && typeof result[request.url].urls !== 'undefined') {
+            if (result[request.url] && typeof result[request.url] !== 'undefined' && typeof result[request.url].urls !== 'undefined') {
                 console.log('Soundboard files currently are ', request.url, result);
                 soundboardUrls = result[request.url].urls;
             } else {
                 console.log('No soundboard found at:', request.url, result);
             }
-            if (typeof result.keyMap !== 'undefined') {
-                keyMap = result.keyMap;
+
+            if (result[request.url] && typeof result[request.url].keyMap !== 'undefined') {
+                console.log('Keymaps currently are ', result[request.url].keyMap);
+                keyMap = result[request.url].keyMap;
+            } else {
+                console.log('No keymaps found at:', request.url, result);
             }
 
             // Combine any stored urls with new found urls and only store unique
