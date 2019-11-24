@@ -1,4 +1,6 @@
-console.log('content script loaded');
+/**
+ * The content script.
+ */
 
 const extensions = ['m4a', 'mp3', 'ogg', 'wav'],
     url = window.location.href.split(/[#?]/)[0]; // remove queries or hashes
@@ -9,11 +11,6 @@ function filterResource(resource) {
     if (fileExt && extensions.indexOf(fileExt) > -1) {
         return file;
     }
-}
-
-function checkResources() {
-
-
 }
 
 // Get all the audio resources available on the page after window is loaded
@@ -91,7 +88,7 @@ window.onload = (event) => {
         });
 
     });
-}
+};
 
 
 // var menuItem = {
@@ -102,11 +99,6 @@ window.onload = (event) => {
 //
 // chrome.contextMenus.create(menuItem);
 
-function isInt(value) {
-    return !isNaN(value) &&
-        parseInt(Number(value)) == value &&
-        !isNaN(parseInt(value, 10));
-}
 
 // chrome.contextMenus.onClicked.addListener(function(clickData){
 //     if (clickData.menuItemId == "spendMoney" && clickData.selectionText){
