@@ -18,6 +18,7 @@ const checkSounds = document.getElementById('checkSounds'),
     speedOutput = document.getElementById("speedOutput"),
     speedAll = document.getElementById('speedAll'),
     sounds = document.getElementById('sounds'),
+    options = document.getElementById('options'),
     message = document.getElementById('message'),
     keys = document.querySelectorAll('.keyboard .key:not(.disabled)'),
     modal = document.getElementById("myModal"),
@@ -59,8 +60,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
         };
     }
 
-    // Check if we already have sound urls stored
-    checkForSounds();
+    // Check if we already have sound urls stored, but delay enough to let popup.html show
+    setTimeout(checkForSounds, 50);
 });
 
 soundboard.playbackSpeedControl = playbackSpeed;
@@ -77,6 +78,7 @@ startDelay.oninput = function() {
 
 playbackSpeed.oninput = function() {
     speedOutput.innerHTML = this.value;
+    console.log(parseFloat(this.value));
     soundboard.speed = parseFloat(this.value);
 
 };
@@ -129,7 +131,9 @@ sample.onclick = function (element) {
         console.log('Sample sound: ', key, sound, startOffset);
 
         if (sound instanceof Switcher || sound instanceof Audio) {
-            sound.currentTime = startOffset / 100 * sound.duration;
+            sound.currentTime = startOffset ? startOffset / 100 * sound.duration : 0;
+
+            console.log(sound.currentTime, typeof sound.currentTime);
 
             sound.play();
         } else {
@@ -143,6 +147,7 @@ sample.onclick = function (element) {
 
 sounds.onchange = function (element) {
     let soundUrl = sounds.options[sounds.selectedIndex].innerText;
+    console.log('Sound change', soundUrl, typeof soundboard.sounds[soundUrl] !== 'undefined' ? soundboard.sounds[soundUrl] : 'undefined');
     if (typeof soundboard.sounds[soundUrl] === 'undefined') {
         soundboard.loadSound(soundUrl, 1);
     }
@@ -155,6 +160,14 @@ stop.onclick = function (element) {
 
 checkSounds.onclick = function (element) {
     checkForSounds(true)
+};
+
+options.onclick = function (element) {
+    if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+    } else {
+        window.open(chrome.runtime.getURL('options.html'));
+    }
 };
 
 // TODO: finish key mapping storage and retrieval
