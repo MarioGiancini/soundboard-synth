@@ -1,0 +1,562 @@
+:root {
+    --black: #050505;
+    --gray-100: #191919;
+    --gray-200: #222222;
+    --gray-300: #333333;
+    --gray-400: #444444;
+    --gray-500: #555555;
+    --gray-600: #696969;
+    --gray-700: #8e8e8e;
+    --gray-800: #AFAFAF;
+    --gray-900: #DEDEDE;
+    --primary: #00d1b2;
+
+    --key-width: 38px;
+    --key-width-short: 28px;
+    --padding: 1.25em;
+}
+
+.panel a, .modal a {
+    color: var(--gray-700);
+    transition: color .1s ease;
+}
+
+.flex {
+    display: flex;
+}
+
+.container .panel {
+    background-color: var(--gray-100);
+    border-radius: 0;
+}
+
+.panel.is-primary .panel-heading {
+    border-radius: 0;
+    background: -webkit-linear-gradient(180deg, var(--primary), var(--gray-100));
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+}
+
+.panel.is-primary .panel-heading .app-title {
+    flex: 1;
+    font-weight: 300;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+}
+
+.panel.is-primary .panel-heading .app-title i {
+    margin-right: 5px;
+}
+
+.panel.is-primary .panel-heading .app-version {
+    color: var(--gray-300);
+    font-size: .5em;
+}
+
+.panel .panel-block {
+    padding: var(--padding);
+    position: relative;
+}
+
+.panel .panel-block:before {
+    color: var(--gray-400);
+    font-size: 75%;
+    letter-spacing: 5px;
+    position: absolute;
+    text-transform: uppercase;
+    top: -2px;
+}
+
+#controls:before {
+    content: "Global Controls";
+}
+
+#mapper:before {
+    content: "Key Mapping"
+}
+
+.panel .panel-block .field {
+    margin-bottom: 0;
+}
+
+.panel .panel-block:not(:last-child), .panel .panel-tabs:not(:last-child) {
+    border-bottom-color: var(--gray-300);
+}
+
+button {
+    font-weight: 700;
+    transition: background-color .1s ease, color .1s ease;
+}
+
+button.is-primary.is-outlined:hover,
+button.is-primary.is-outlined:active,
+button.is-primary.is-outlined:focus {
+    color: var(--gray-100) !important;
+}
+
+.keyboard {
+    width: 100%;
+    background-color: var(--gray-100);
+    margin: 0 auto;
+    color: var(--gray-800);
+}
+
+.keyboard, .keyboard * {
+    box-sizing: initial;
+}
+
+.lights {
+    float: right;
+    position: relative;
+    top: -45px;
+    right: 8px;
+    padding: 0;
+    margin: 0;
+}
+
+.lights span {
+    margin: 0 20px 0 20px;
+    padding: 0;
+    text-align: center;
+}
+
+.lights span:after {
+    content: "";
+    width: 11px;
+    height: 8px;
+    top: 22px;
+    margin-left: -9px;
+    background-color: #DBB921;
+    position: absolute;
+    border-radius: 3px;
+}
+
+.key {
+    width: var(--key-width);
+    height: var(--key-width);
+    display: block;
+    background-color: var(--gray-300);
+    text-align: left;
+    padding-left: 8px;
+    line-height: 29px;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    float: left;
+    margin-left: 2px;
+    margin-bottom: 2px;
+    cursor: pointer;
+    position: relative;
+    transition: box-shadow 0.1s ease;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.key.disabled {
+    background-color: var(--gray-200);
+    color: var(--gray-500);
+    cursor: default;
+}
+
+.key:not(.disabled):hover {
+    box-shadow: 0 0 10px var(--primary);
+    color: var(--primary);
+    z-index: 1000;
+}
+
+.key.tap {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.key.mapped {
+    background-color: var(--gray-400);
+    font-family: BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: normal;
+}
+
+.key.mapped:before {
+    font-family: "Font Awesome 5 Pro";
+    font-size: .75em;
+    color: var(--gray-200);
+    content: "\f8f1";
+    position: absolute;
+    bottom: -6px;
+    right: 3px;
+}
+
+.key.mapped.tap:before, .key.mapped.tap:after {
+    color: var(--primary);
+}
+
+.section-a {
+    width: 614px;
+}
+
+.section-b {
+    width: 150px;
+    height: 260px;
+    float: left;
+}
+
+.function {
+    font-size: 12px;
+    width: var(--key-width-short);
+    height: var(--key-width-short);
+    margin-bottom: 15px;
+}
+
+.small {
+    font-size: 10px;
+    line-height: 13px;
+    text-align: center;
+    padding: 2px 5px 0;
+    height: 28px !important;
+}
+
+.space1 {
+    margin-right: 43px !important;
+}
+
+.space2 {
+    margin-right: 25px !important;
+}
+
+.dual {
+    font-size: 14px;
+    line-height: 20px;
+    width: var(--key-width-short);
+}
+
+.backspace {
+    width: 82px;
+    font-size: 12px;
+}
+
+.tab {
+    width: 48px;
+    line-height: var(--key-width);
+    font-size: 13px;
+}
+
+.letter, .arrow, .opt {
+    width: var(--key-width-short);
+}
+
+.slash {
+    width: 62px;
+}
+
+.caps {
+    width: 68px;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.enter {
+    width: 90px;
+    line-height: var(--key-width);
+    text-align: center;
+    padding-left: 0;
+}
+
+.shift.left {
+    width: 88px;
+    line-height: var(--key-width);
+    font-size: 13px;
+}
+
+.shift.right {
+    width: 102px;
+    line-height: var(--key-width);
+    font-size: 13px;
+}
+
+.ctrl {
+    line-height: var(--key-width);
+    font-size: 13px;
+}
+
+.space {
+    width: 212px;
+}
+
+.sec-func .key {
+    width: 32px;
+    font-size: 10px;
+    text-align: left;
+    line-height: var(--key-width);
+    float: left;
+}
+
+.sec-func div.dual {
+    line-height: 20px;
+}
+
+.arrows .key {
+    text-align: center;
+    padding-left: 7px;
+    margin-left: 2px;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.field .select select, .panel-block:last-child {
+    background-color: transparent;
+    color: var(--gray-600);
+}
+
+.select select {
+    width: 100%;
+}
+
+.control {
+    line-height: 1;
+}
+
+.control-display {
+    margin-bottom: 5px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 20px;
+    background-color: var(--gray-300);
+    outline: none;
+    -webkit-transition: background-color .2s ease;
+    transition: background-color .2s ease;
+}
+
+.slider:hover {
+    background-color: var(--gray-400);
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: var(--primary);
+    cursor: pointer;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    opacity: 0.75;
+    width: 60px !important;
+    height: 40px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.toggle {
+    position: absolute;
+    cursor: pointer;
+    width: 100%;
+    height: 20px;
+    left: 0;
+    top: 18px;
+    background-color: var(--gray-300);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.toggle:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 30px;
+    left: 0;
+    bottom: 0;
+    background-color: var(--gray-600);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .toggle:before {
+    background-color: var(--primary);
+}
+
+input:checked + .toggle:before {
+    -webkit-transform: translateX(30px);
+    -ms-transform: translateX(30px);
+    transform: translateX(30px);
+}
+
+.toggle:hover {
+    background-color: var(--gray-400);
+}
+
+#mapper > *, #controls > *, #message {
+    flex: 1;
+    margin-right: 10px;
+}
+
+#mapper > *:last-child, #controls > *:last-child {
+    margin-right: 0;
+}
+
+#info, #stop, #checkSounds, #sample, #options {
+    flex: 0;
+}
+
+#speedAllSwitch, #retriggerSwitch {
+    flex: none;
+}
+
+/* The Modal (background) */
+.modal {
+    color: var(--gray-800);
+    display: none;
+    position: fixed;
+    z-index: 40;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    -webkit-animation-name: fadeIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeIn;
+    animation-duration: 0.4s
+}
+
+/* Modal Content */
+.modal-content {
+    position: fixed;
+    bottom: 0;
+    background-color: var(--gray-300);
+    margin: 0;
+    max-height: initial;
+    width: 100%;
+    -webkit-animation-name: slideIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: slideIn;
+    animation-duration: 0.4s
+}
+
+/* The Close Button */
+.close {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+    transition: color .1s ease;
+}
+
+.close:hover,
+.close:focus {
+    color: var(--gray-600);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    background-color: var(--primary);
+    color: var(--gray-100);
+    font-size: 20px;
+    padding: 4px var(--padding);;
+}
+
+.modal-body {
+    font-size: 80%;
+    padding: 20px var(--padding);;
+}
+
+.modal-body h3 {
+    font-size: 100%;
+    font-weight: 700;
+    border-bottom: 1px solid;
+    margin-bottom: 10px;
+}
+
+.modal-body a {
+    color: var(--gray-900);
+    font-weight: 700;
+}
+
+.modal-body strong {
+    color: var(--primary);
+}
+
+.modal-body ol, .modal-body ul {
+    margin-left: 20px;
+}
+
+.modal-body ul {
+    list-style: disc;
+}
+
+.modal-footer {
+    background-color: var(--gray-200);
+    color: var(--gray-500);
+    font-size: 14px;
+    line-height: 1;
+    padding: 10px var(--padding);
+}
+
+/* Tables and options page */
+section {
+    margin-top: 3em;
+}
+.table.is-aligned-middle th, .table.is-aligned-middle td {
+    vertical-align: middle;
+}
+
+.dropdown-content {
+    max-height: 280px;
+    overflow: hidden;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.sound-urls .dropdown {
+    display: block;
+}
+
+.sound-urls .button {
+    width: 100%;
+}
+
+/* Add Animation */
+@-webkit-keyframes slideIn {
+    from {bottom: -400px; opacity: 0}
+    to {bottom: 0; opacity: 1}
+}
+
+@keyframes slideIn {
+    from {bottom: -400px; opacity: 0}
+    to {bottom: 0; opacity: 1}
+}
+
+@-webkit-keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
