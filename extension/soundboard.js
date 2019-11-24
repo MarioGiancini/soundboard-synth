@@ -139,7 +139,7 @@ class SoundBoard {
                     let sound = soundBoard.sounds[soundBoard._keyMap[keyCode].src],
                         startOffset = soundBoard._keyMap[keyCode].start;
 
-                    sound.currentTime = startOffset ? (startOffset / 100) * sound.duration : 0;
+                    sound.currentTime = startOffset && typeof startOffset === 'number' ? (startOffset / 100) * sound.duration : 0;
 
                     soundBoard.play(sound, keyCode);
                     soundBoard.message.innerText = soundBoard._keyMap[keyCode].src;
