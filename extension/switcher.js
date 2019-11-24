@@ -58,11 +58,12 @@ class Switcher {
     }
 
     play() {
-        let audio = this.channels[this.index++];
-        audio.playbackRate = this.playbackRate;
-        audio.currentTime = this.currentTime;
-        audio.play();
+        this.index++;
         this.index = this.index < this.num ? this.index : 0;
+        let audio = this.channels[this.index];
+        audio.playbackRate = this.playbackRate;
+        audio.currentTime = this.currentTime && typeof this.currentTime === 'number' ? this.currentTime : 0;
+        audio.play();
     }
 
     pause() {
