@@ -152,7 +152,15 @@ class SoundBoard {
             if (key) {
                 key.classList.remove('tap');
             }
-        }
+        };
+
+        // Clear all tapped keys if we blur on the soundboard
+        window.onblur = () => {
+            let keys = document.querySelectorAll('.key.tap');
+            keys.forEach(key => {
+                key.classList.remove('tap');
+            });
+        };
     }
 
     set keyMap(map) {
