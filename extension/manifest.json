@@ -1,7 +1,7 @@
 {
-  "name": "Woah Example Extension!",
+  "name": "Soundboard Synth",
   "version": "1.0",
-  "description": "Build an Extension!",
+  "description": "Discover and manipulate sounds on websites and play them back with ease by mapping sounds to your keyboard.",
   "permissions": ["activeTab", "storage", "tabs", "notifications"],
   "options_page": "options.html",
   "content_scripts": [
