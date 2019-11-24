@@ -6,10 +6,85 @@
 
 	<title>Soundboard Synth Options</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+	<link rel="stylesheet" href="css/fontawesome.min.css">
+	<link rel="stylesheet" href="css/regular.min.css">
+	<link rel="stylesheet" href="css/solid.min.css">
+	<link rel="stylesheet" href="css/duotone.min.css">
+	<link rel="stylesheet" href="css/main.css">
 </head>
-<body>
-<div id="">
-</div>
+<body class="options">
+<nav class="navbar is-fixed-top is-primary">
+	<div class="navbar-brand">
+		<a class="navbar-item" href="https://soundboardsynth.com" target="_blank" title="Soundboard Synth">
+			<i class="fad fa-waveform-path fa-2x"></i>
+		</a>
+
+		<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="settingsNav">
+			<span aria-hidden="true"></span>
+			<span aria-hidden="true"></span>
+			<span aria-hidden="true"></span>
+		</a>
+	</div>
+	<div class="navbar-menu" id="settingsNav">
+		<div class="navbar-start">
+			<a class="navbar-item tab-link is-active" href="#soundboards">
+				<span class="icon">
+					<i class="fas fa-piano-keyboard" aria-hidden="true"></i>
+				</span>
+				<span>Soundboards</span>
+			</a>
+
+			<a class="navbar-item tab-link" href="#settings">
+				<span class="icon">
+					<i class="fas fa-sliders-h-square" aria-hidden="true"></i>
+				</span>
+				<span>Settings</span>
+			</a>
+		</div>
+
+		<div class="navbar-end">
+			<div class="navbar-item">
+				<div class="buttons">
+					<a class="button is-primary">
+						<strong>Sign up</strong>
+					</a>
+					<a class="button is-light">
+						Log in
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</nav>
+
+<section class="section">
+	<div class="container">
+		<div class="tabs-contents">
+			<div class="tab-content" id="soundboards">
+				<table class="table is-bordered is-aligned-middle is-striped is-narrow is-hoverable is-fullwidth">
+					<thead>
+					<tr>
+						<th>Page</th>
+						<th style="width: 92px;">Key Maps</th>
+						<th>Sound Files</th>
+						<th>Export</th>
+						<th>Download</th>
+						<th>Delete</th>
+					</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+			</div>
+			<div class="tab-content" id="settings" style="display: none;">
+				<div id="all-settings">
+
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
 </body>
 <script src="options.js"></script>
 </html>
