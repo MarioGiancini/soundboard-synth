@@ -1,6 +1,11 @@
-// Copyright 2018 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+/**
+ * The background script.
+ */
+
+/**
+ * @var chrome
+ * @link https://developer.chrome.com/extensions/
+ */
 
 'use strict';
 
@@ -16,7 +21,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
     if (typeof request.type !== 'undefined' && request.type === 'loaded') {
         console.log('REQUEST: loaded', request);
-        chrome.browserAction.setBadgeText({"text": request.total});
+
+        if (request.total > 0) {
+            chrome.browserAction.setBadgeText({"text": request.total});
+            chrome.browserAction.setBadgeBackgroundColor({"color": "#00d1b2"});
+        } else {
+            chrome.browserAction.setBadgeText({"text": ""});
+        }
 
         let soundboardUrls = [],
             keyMap = {};
