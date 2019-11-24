@@ -28,7 +28,7 @@ class SoundBoard {
     playSampleControl;
 
     constructor(numSounds) {
-        this.numSounds = numSounds && Number.isInteger(numSounds) ? numSounds : 10;
+        this.numSounds = numSounds && Number.isInteger(numSounds) ? numSounds : 20;
         this.body = document.querySelector('body');
         this.message = document.getElementById("message");
         this.playbackSpeedControl = document.getElementById("speed");
