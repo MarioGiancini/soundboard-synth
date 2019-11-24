@@ -17,11 +17,9 @@
 </head>
 <body>
 <div class="container">
-
-	<div id="resources"></div>
 	<article class="panel is-primary">
 		<div class="panel-heading">
-			<span class="app-title">Soundboard Synth</span>
+			<span class="app-title"><i class="fad fa-waveform-path"></i>Soundboard Synth</span>
 			<span class="app-version">v1.0.0</span>
 		</div>
 		<div class="panel-block" id="keyboard">
@@ -246,7 +244,7 @@
 					<div data-code="91" class="key alt disabled">
 						Alt
 					</div>
-					<div data-code="32" class="key space disabled">
+					<div data-code="32" class="key space disabled fas fa-play">
 
 					</div>
 					<div data-code="91" class="key alt disabled">
@@ -285,10 +283,11 @@
 				<input type="checkbox" id="speedAll" name="speedAll">
 				<span class="toggle"></span>
 			</label>
-			<button id="stop" class="button is-primary is-outlined" title="Stop All Sounds"> &#9724; </button>
+			<button id="stop" class="button icon-button is-primary is-outlined" title="Stop All Sounds"><i class="fas fa-stop"></i></button>
 			<button id="checkSounds" class="button is-primary is-outlined">Check For Sounds</button>
 			<!-- Trigger/Open The Modal -->
-			<button id="info" class="button is-primary is-outlined is-fullwidth" title="Help / Info"> ? </button>
+			<button id="info" class="button icon-button is-primary is-outlined is-fullwidth icon-button" title="Help / Info"><i class="fas fa-info-circle"></i></button>
+			<button id="options" class="button icon-button is-primary is-outlined is-fullwidth" title="Settings & Options"><i class="fas fa-cogs"></i></button>
 		</div>
 		<div class="panel-block" id="mapper">
 			<div class="field">
@@ -300,7 +299,7 @@
 					</label>
 				</div>
 			</div>
-			<button id="sample" class="button is-primary is-outlined" title="Play Selected Sound"> &#9658; </button>
+			<button id="sample" class="button icon-button is-primary is-outlined" title="Play Selected Sound"><i class="fas fa-play"></i></button>
 			<label class="control has-text-light switch" id="retriggerSwitch" title="When on mapped sound will retrigger on play. Turn off to play multiple copies.">
 				<span class="control-display is-flex">
 					<small>Retrigger</small>
@@ -310,7 +309,7 @@
 			</label>
 			<label for="start" style="line-height: 1;" class="has-text-light">
 				<span class="is-flex" style="margin-bottom: 5px;">
-					<small style="flex: 1;">Start Delay: </small>
+					<small style="flex: 1;">Start Position: </small>
 					<small class="has-text-primary"><span id="startOutput">0</span>%</small>
 				</span>
 				<input class="slider" id="start" name="start" type="range" value="0" min="0" max="100">
@@ -360,8 +359,8 @@
 </div>
 
 <!-- load JS, order matters -->
-<script src="switcher.js"></script>
-<script src="soundboard.js"></script>
-<script src="popup.js"></script>
+<script defer src="switcher.js"></script>
+<script defer src="soundboard.js"></script>
+<script defer src="popup.js"></script>
 </body>
 </html>
