@@ -3,6 +3,8 @@
  */
 'use strict';
 
+let stopDownload = false;
+
 function createDropDown(title, id, items, isLink) {
   const dropDown = document.createElement('div'),
       dropDownTrigger = document.createElement('div'),
@@ -76,7 +78,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const bg = chrome.extension.getBackgroundPage(),
       table = document.querySelector('.table tbody'),
+      anchors = document.querySelectorAll('a'),
       fragment = document.createDocumentFragment();
+
+  anchors.forEach(anchor => {
+    anchor.addEventListener('click', handleLinkClicks);
+  });
+
+  console.log()
 
   chrome.storage.local.getBytesInUse(null, function (bytesInUse) {
     const total = document.getElementById('all-settings');
@@ -94,7 +103,8 @@ document.addEventListener('DOMContentLoaded', function () {
           exportPage = document.createElement('td'),
           downloadSounds = document.createElement('td'),
           removePage = document.createElement('td'),
-          removeButton = document.createElement('button');
+          removeButton = document.createElement('button'),
+          downloadButton = document.createElement('button');
 
       let hasKeyMap = false,
           dropDown = null;
@@ -130,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         column.classList.add('has-text-centered');
       });
 
+      // Build remove button
       removeButton.classList.add('button', 'remove');
       removeButton.setAttribute('title', 'Remove Page?');
       removeButton.addEventListener('click', function(event) {
@@ -137,8 +148,30 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       removeButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
       removePage.appendChild(removeButton);
+
+      // Build export button
       exportPage.innerHTML = '<button class="button remove" title="Click To Export Page Settings"><i class="fas fa-file-export"></i></button>';
-      downloadSounds.innerHTML = '<button class="button remove" title="Click To Download All Sounds"><i class="fas fa-download"></i></button>';
+
+      // Build download button
+      downloadButton.innerHTML = '<i class="fas fa-download"></i>';
+      downloadButton.classList.add('button', 'remove');
+      downloadButton.setAttribute('title', 'Click To Download All Sounds');
+      downloadButton.addEventListener('click',  event => {
+        const tr = downloadButton.closest('tr'),
+            url = tr.dataset.url,
+            soundAnchors = document.querySelectorAll('tr[data-url="' + url + '"] .sound-urls .dropdown-item a');
+
+        let soundUrls = [];
+
+        soundAnchors.forEach(function (a) {
+          soundUrls.push(a.href);
+        });
+
+        downloadSoundFiles(soundUrls, url).then(result => {
+          console.log('Download complete', result);
+        });
+      });
+      downloadSounds.appendChild(downloadButton);
 
       tr.appendChild(th);
       tr.appendChild(keyMap);
@@ -246,4 +279,200 @@ function showNotification(type, header, message) {
   messageHeader.appendChild(p);
   messageHeader.appendChild(closeButton);
 
+  article.appendChild(messageHeader);
+  article.appendChild(messageBody);
+
+}
+
+function showDownloadModal(page, count, flavorText) {
+  const modal = document.createElement('div'),
+      background = document.createElement('div'),
+      card = document.createElement('div'),
+      cardTitle = document.createElement('p'),
+      cardHeader = document.createElement('header'),
+      cardBody = document.createElement('section'),
+      cardFooter = document.createElement('footer'),
+      closeButton = document.createElement('button'),
+      cancelButton = document.createElement('button');
+
+  modal.classList.add('modal', 'is-active');
+  modal.id = 'download';
+  background.classList.add('modal-background');
+  card.classList.add('modal-card');
+  cardTitle.classList.add('modal-card-title');
+  cardTitle.innerHTML = 'Preparing Download From ' + page;
+  cardHeader.classList.add('modal-card-head');
+  cardBody.classList.add('modal-card-body');
+  cardBody.innerHTML = `
+    <p>${flavorText}</p>
+    <p>Downloading <span id="current">1</span> of <span id="count">${count}</span></p>
+    <progress id="progress" class="progress is-primary is-large" value="1" max="100">0%</progress>
+    <p>A zip file will download automatically once complete.</p>
+  `;
+  cardFooter.classList.add('modal-card-foot');
+  closeButton.classList.add('close', 'delete');
+  cancelButton.classList.add('cancel', 'button');
+  cancelButton.innerText = 'cancel';
+  closeButton.setAttribute('aria-label', 'close');
+  closeButton.addEventListener('click', function(event) {
+    modal.classList.add('fade-out');
+    setTimeout(function() {
+      modal.style.display = 'none';
+      modal.remove();
+    }, 400)
+  });
+  cancelButton.addEventListener('click', function(event) {
+    modal.classList.add('fade-out');
+    setTimeout(function() {
+      modal.style.display = 'none';
+      modal.remove();
+    }, 400);
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'Options',
+      eventAction: 'click',
+      eventLabel: page
+    });
+  });
+
+  // Put the modal together
+  cardHeader.appendChild(cardTitle);
+  cardHeader.appendChild(closeButton);
+  cardFooter.appendChild(cancelButton);
+  card.appendChild(cardHeader);
+  card.appendChild(cardBody);
+  card.appendChild(cardFooter);
+
+  modal.appendChild(background);
+  modal.appendChild(card);
+  document.body.appendChild(modal);
+}
+
+/**
+ * Fetch a blob from a URL
+ * @param url
+ * @return {Promise<boolean|Blob>}
+ */
+async function fetchBlob(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Network response was not ok.');
+    }
+    const blob = await response.blob();
+    console.log('Audio blob created', blob);
+    return blob;
+  } catch (error) {
+    console.log('There has been a problem with your fetch operation: ', error.message);
+    return false;
+  }
+}
+
+/**
+ * Get the location properties of a url by creating an anchor element.
+ * Get the domain by using a.hostname
+ * @param url string
+ * @return {HTMLAnchorElement}
+ */
+function getLocation(url) {
+  const a = document.createElement("a");
+  a.href = url;
+  return a;
+}
+
+/**
+ * Download all the audio files from an array of urls
+ * @param files
+ * @param page
+ * @return {Promise<boolean|void>}
+ */
+async function downloadSoundFiles(files, page) {
+  const zip = new JSZip(),
+      today = new Date(),
+      domain = getLocation(page).hostname;
+
+  let successes = [],
+      failures = [],
+      readme = 'This is a generated file created from Soundboard Synth.\nSounds downloaded from: ' + page,
+      folderName = 'soundboard-' + domain + '-' + today.getTime(),
+      fileCount = 1;
+
+  const folder = zip.folder(folderName);
+  let flavorText = 'Woah... whatcha gonna do with all those sound files bruh?? Grab a <i class="fas fa-coffee"></i> this make take a sec...'
+  showDownloadModal(page, files.length, flavorText);
+
+  for (const file of files) {
+    let sound = await fetchBlob(file),
+        current = document.getElementById('current'),
+        progress = document.getElementById('progress'),
+        percent = Math.floor(fileCount/files.length * 100).toString();
+
+    if (stopDownload) {
+      break;
+    }
+
+    if (sound) {
+      let fileName = file.replace(/^.*[\\\/]/, '');
+      successes.push(file);
+
+      // Add a file to the directory,
+      folder.file(fileName, sound);
+    } else {
+      failures.push(file);
+    }
+    // Show progress
+    current.innerText = fileCount.toString();
+    progress.value = percent;
+    progress.innerText = percent;
+    fileCount++;
+  }
+
+  if (stopDownload) {
+    console.log('Download cancelled');
+    // Fade out and close the modal
+    document.querySelector(domain + '.close').click();
+    return false;
+  } else {
+
+    // Update readme with successes and failures
+    if (successes.length) {
+      readme += '\n\nDownloaded Successfully: \n';
+      readme += successes.join('\n');
+    }
+
+    if (failures.length) {
+      readme += '\n\nFailed To Download: \n';
+      readme += failures.join('\n');
+    }
+
+    readme += '\n\nThanks for using Soundboard Synth!! <3 https://soundboardsynth.com';
+
+    // Add a readme text file listing sound file and page contents
+    folder.file("_readme.txt", readme);
+
+    // Generate the zip file asynchronously
+    zip.generateAsync({type: "blob"})
+        .then(function (content) {
+          // Force down of the Zip file using FileSaver
+          saveAs(content, folderName + '.zip');
+          // Fade out and close the modal
+          document.querySelector('#download .close').click();
+
+          ga('send', {
+            hitType: 'event',
+            eventCategory: 'Options',
+            eventAction: 'download',
+            eventLabel: page
+          });
+        });
+  }
+}
+
+function handleLinkClicks(event) {
+  ga('send', 'event', {
+    eventCategory: 'Options',
+    eventAction: 'click',
+    eventLabel: event.target.href,
+    transport: 'beacon'
+  });
 }
