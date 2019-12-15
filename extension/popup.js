@@ -1,6 +1,6 @@
-// Copyright 2018 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+/**
+ * The Popup JavaScript file used in extension popup view.
+ */
 
 'use strict';
 
@@ -26,7 +26,16 @@ const checkSounds = document.getElementById('checkSounds'),
     stop = document.getElementById("stop"),
     close = document.getElementsByClassName("close")[0],
     anchors = document.getElementsByTagName('a'),
-    soundboard = new SoundBoard();
+    soundboard = new SoundBoard(),
+    urlParams = new URLSearchParams(window.location.search);
+
+// Check if we're loading the popup in solo mode
+let isSolo = urlParams.has('soundboard'),
+    requestedSoundboard = isSolo ? urlParams.get('soundboard') : '';
+
+if (isSolo) {
+    document.body.classList.add('solo');
+}
 
 speedAll.addEventListener('change', (event) => {
     soundboard.speedAll = !!event.target.checked;
@@ -61,7 +70,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
     }
 
     // Check if we already have sound urls stored, but delay enough to let popup.html show
-    setTimeout(checkForSounds, 50);
+    setTimeout( function () {
+        if (isSolo && requestedSoundboard) {
+            checkForSounds(false, requestedSoundboard)
+        } else {
+            checkForSounds();
+        }
+    }, 50);
 });
 
 soundboard.playbackSpeedControl = playbackSpeed;
@@ -200,32 +215,46 @@ mapKey.onclick = function (element) {
     });
 };
 
-function checkForSounds(force) {
+function checkForSounds(force, useUrl) {
+    // If we're requesting a soundboard url directly use that, else get it from the current tab
+    if (useUrl) {
+        soundboard.url = useUrl;
+        chrome.storage.local.get(useUrl, function (result) {
+            if (typeof result[useUrl] !== 'undefined' && typeof result[useUrl].urls !== 'undefined' && result[useUrl].urls.length) {
+                console.log('Soundboard loaded directly from ', result[useUrl]);
+                // send saved url and soundboard resources
+                showResources(result);
+            } else {
+                console.log('No soundboard files saved yet so sending to background...', tabs[0].url, result);
+                chrome.tabs.sendMessage(tabs[0].id, {type: 'load'}, showResources);
+            }
+        });
+    } else {
+        chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
 
-    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+            if (force) {
+                console.log('Rechecking for audio files...');
+                chrome.tabs.sendMessage(tabs[0].id, {type: 'load'}, showResources);
+            } else {
+                // Get array of current sound files by unique url of the current tab
+                const thisUrl = [tabs[0].url.split(/[#?]/)[0]];
+                soundboard.url = thisUrl;
+                chrome.storage.local.get(thisUrl, function (result) {
 
-        if (force) {
-            console.log('Rechecking for audio files...');
-            chrome.tabs.sendMessage(tabs[0].id, {type: 'load'}, showResources);
-        } else {
-            // Get array of current sound files by unique url of the current tab
-            const thisUrl = [tabs[0].url.split(/[#?]/)[0]];
-            soundboard.url = thisUrl;
-            chrome.storage.local.get(thisUrl, function (result) {
+                    if (typeof result[thisUrl] !== 'undefined' && typeof result[thisUrl].urls !== 'undefined' && result[thisUrl].urls.length) {
+                        console.log('Soundboard currently is ', result[thisUrl]);
+                        // send saved url and soundboard resources
+                        showResources(result);
+                    } else {
+                        console.log('No soundboard files saved yet so sending to background...', tabs[0].url, result);
+                        chrome.tabs.sendMessage(tabs[0].id, {type: 'load'}, showResources);
 
-                if (typeof result[thisUrl] !== 'undefined' && typeof result[thisUrl].urls !== 'undefined' && result[thisUrl].urls.length) {
-                    console.log('Soundboard currently is ', result[thisUrl]);
-                    // send saved url and soundboard resources
-                    showResources(result);
-                } else {
-                    console.log('No soundboard files saved yet so sending to background...', tabs[0].url, result);
-                    chrome.tabs.sendMessage(tabs[0].id, {type: 'load'}, showResources);
+                    }
 
-                }
-
-            });
-        }
-    });
+                });
+            }
+        });
+    }
 }
 
 function showResources(response) {
@@ -233,7 +262,7 @@ function showResources(response) {
     const sounds = document.getElementById('sounds');``
     let message = "No audio files found. Try reloading the page or extension.";
 
-    console.log('SHOW RESOURCES',response);
+    console.log('SHOW RESOURCES', response);
 
     if (response && typeof response[soundboard.url] !== "undefined" && typeof response[soundboard.url].urls !== "undefined" && response[soundboard.url].urls.length) {
         message = "Loading " + response[soundboard.url].urls.length + " sound files...";

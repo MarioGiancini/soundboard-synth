@@ -524,6 +524,26 @@ input:checked + .toggle:before {
     animation-duration: 0.4s
 }
 
+/* SOLO Soundboard page */
+body.solo {
+    background-color: var(--gray-100);
+    min-height: 100vh;
+}
+
+.solo .container {
+    max-width: 100%;
+}
+
+.solo .panel-block {
+    border: 1px solid var(--gray-300);
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+.solo .keyboard {
+    width: auto;
+}
+
 /* Tables and options page */
 section:not(.modal-card-body) {
     margin-top: 3em;
