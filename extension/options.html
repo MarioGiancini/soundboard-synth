@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="css/regular.min.css">
 	<link rel="stylesheet" href="css/solid.min.css">
 	<link rel="stylesheet" href="css/duotone.min.css">
+	<link rel="stylesheet" href="css/brands.min.css">
 	<link rel="stylesheet" href="css/main.css">
 </head>
 <body class="options">
@@ -40,16 +41,51 @@
 				</span>
 				<span>Settings</span>
 			</a>
+
+			<div class="navbar-item has-dropdown is-hoverable">
+				<a class="navbar-link">
+					More
+				</a>
+
+				<div class="navbar-dropdown">
+					<a class="navbar-item">
+						Docs
+					</a>
+					<a class="navbar-item">
+						About
+					</a>
+					<hr class="navbar-divider">
+					<a class="navbar-item">
+						Request Feature
+					</a>
+					<hr class="navbar-divider">
+					<a class="navbar-item">
+						Report Issue
+					</a>
+				</div>
+			</div>
 		</div>
 
 		<div class="navbar-end">
 			<div class="navbar-item">
 				<div class="buttons">
-					<a class="button is-primary">
-						<strong>Sign up</strong>
+					<a class="button  is-primary">
+						<span class="icon">
+					      <i class="fas fa-heart"></i>
+					    </span>
+						<span>Donate!</span>
 					</a>
-					<a class="button is-light">
-						Log in
+					<a class="button" href="https://github.com/MarioGiancini/soundboard-synth">
+					    <span class="icon">
+					      <i class="fab fa-github"></i>
+					    </span>
+						<span>Fork On GitHub</span>
+					</a>
+					<a class="button">
+						<span class="icon">
+					      <i class="fas fa-star"></i>
+					    </span>
+						<span>Rate</span>
 					</a>
 				</div>
 			</div>
@@ -61,6 +97,20 @@
 	<div class="container">
 		<div class="tabs-contents">
 			<div class="tab-content" id="soundboards">
+				<div class="field has-addons">
+					<p class="control">
+						<button class="button">
+							<span class="icon is-small"><i class="fas fa-align-left"></i></span>
+							<span>Left</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button">
+							<span class="icon is-small"><i class="fas fa-align-center"></i></span>
+							<span>Center</span>
+						</button>
+					</p>
+				</div>
 				<table class="table is-bordered is-aligned-middle is-striped is-narrow is-hoverable is-fullwidth">
 					<thead>
 					<tr>
@@ -86,5 +136,8 @@
 	</div>
 </section>
 </body>
+<script defer src="analytics.js"></script>
+<script defer src="FileSaver.min.js"></script>
+<script defer src="jszip.min.js"></script>
 <script src="options.js"></script>
 </html>
