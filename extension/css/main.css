@@ -517,8 +517,15 @@ input:checked + .toggle:before {
     padding: 10px var(--padding);
 }
 
+.modal.fade-out {
+    -webkit-animation-name: fadeOut;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeOut;
+    animation-duration: 0.4s
+}
+
 /* Tables and options page */
-section {
+section:not(.modal-card-body) {
     margin-top: 3em;
 }
 .table.is-aligned-middle th, .table.is-aligned-middle td {
@@ -559,4 +566,14 @@ section {
 @keyframes fadeIn {
     from {opacity: 0}
     to {opacity: 1}
+}
+
+@-webkit-keyframes fadeOut {
+    from {opacity: 1}
+    to {opacity: 0}
+}
+
+@keyframes fadeOut {
+    from {opacity: 1}
+    to {opacity: 0}
 }
