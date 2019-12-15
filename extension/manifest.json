@@ -4,6 +4,7 @@
   "description": "Discover and manipulate sounds on websites and play them back with ease by mapping sounds to your keyboard.",
   "permissions": ["activeTab", "storage", "tabs", "notifications"],
   "options_page": "options.html",
+  "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
