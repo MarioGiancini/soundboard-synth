@@ -298,6 +298,13 @@ class SoundBoard {
             audio.playbackRate = this.speed;
             audio.play();
 
+            ga('send', {
+                hitType: 'event',
+                eventCategory: 'Audio',
+                eventAction: 'play',
+                eventLabel: audio.src
+            });
+
             this.previousSound = audio;
         } else {
             console.log('Oops.. can only play Audio objects.');

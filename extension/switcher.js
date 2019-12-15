@@ -54,6 +54,14 @@ class Switcher {
         if (this.loaded === this.num) {
             this.loadComplete = true;
             this.soundBoard.loadedResource(this.src);
+
+            ga('send', {
+                hitType: 'event',
+                eventCategory: 'Audio',
+                eventAction: 'loaded',
+                eventLabel: this.src,
+                eventValue: this.duration
+            });
         }
     }
 
@@ -70,16 +78,26 @@ class Switcher {
         this.channels[this.index].pause();
     }
 
-    unpause() {
-        this.channels[this.index].pause();
-    }
-
     stop() {
-        console.log('Stopping channels');
+        const switcher = this;
+        let wasPlaying = false;
         this.channels.forEach(function(channel, index) {
-            channel.pause();
-            channel.currentTime = 0;
+            if (!channel.paused) {
+                wasPlaying = true;
+                channel.pause();
+                channel.currentTime = switcher.currentTime;
+            }
         });
+
+        // Stop is called on all Switchers so on send events no sources that were playing
+        if (wasPlaying) {
+            ga('send', {
+                hitType: 'event',
+                eventCategory: 'Audio',
+                eventAction: 'stop',
+                eventLabel: switcher.src
+            });
+        }
     }
 
     reset() {
