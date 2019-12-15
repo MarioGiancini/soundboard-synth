@@ -9,7 +9,7 @@ function filterResource(resource) {
     let file = resource.name.split(/[#?]/)[0], // remove queries or hashes
         fileExt = file.split('.').pop();
     if (fileExt && extensions.indexOf(fileExt) > -1) {
-        return file;
+        return resource.name;
     }
 }
 
