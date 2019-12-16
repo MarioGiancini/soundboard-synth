@@ -8,9 +8,10 @@ class Switcher {
     num; // how many audio instances loaded
     _playbackRate;
     soundBoard; // instance of SoundBoard
+    skipOnLoad; // skip notify when the Switcher is fully loaded
     src;
 
-    constructor(src, soundBoard, channels) {
+    constructor(src, soundBoard, channels, skipOnLoad) {
         this.channels = [];
         this.num = channels;
         this.index = 0;
@@ -19,6 +20,7 @@ class Switcher {
         this.soundBoard = soundBoard;
         this.playbackRate = 1; // needs to be after soundBoard since we check it
         this.src = src;
+        this.skipOnLoad = !!skipOnLoad;
 
         let switcher = this;
 
@@ -53,7 +55,7 @@ class Switcher {
 
         if (this.loaded === this.num) {
             this.loadComplete = true;
-            this.soundBoard.loadedResource(this.src);
+            this.soundBoard.loadedResource(this.src, this.skipOnLoad);
 
             ga('send', {
                 hitType: 'event',

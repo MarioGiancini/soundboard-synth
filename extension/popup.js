@@ -93,7 +93,6 @@ startDelay.oninput = function() {
 
 playbackSpeed.oninput = function() {
     speedOutput.innerHTML = this.value;
-    console.log(parseFloat(this.value));
     soundboard.speed = parseFloat(this.value);
 
 };
@@ -121,9 +120,6 @@ for (const key of keys) {
             {
                 keyCode: keyCode
             });
-
-
-        message.innerText = keyCode;
 
         if (keyCode === soundboard.speedUp || soundboard.speedDown) {
             playbackSpeed.value = speedOutput.innerHTML = soundboard.speed;
@@ -164,7 +160,7 @@ sounds.onchange = function (element) {
     let soundUrl = sounds.options[sounds.selectedIndex].innerText;
     console.log('Sound change', soundUrl, typeof soundboard.sounds[soundUrl] !== 'undefined' ? soundboard.sounds[soundUrl] : 'undefined');
     if (typeof soundboard.sounds[soundUrl] === 'undefined') {
-        soundboard.loadSound(soundUrl, 1);
+        soundboard.loadSound(soundUrl, 1, true);
     }
 };
 
@@ -185,35 +181,37 @@ options.onclick = function (element) {
     }
 };
 
-// TODO: finish key mapping storage and retrieval
-
 mapKey.onclick = function (element) {
-    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-
-        if (sounds.options.length > 1) {
-
-            let key = parseInt(sounds.options[sounds.selectedIndex].value),
-                soundRetrigger = retrigger.checked,
-                soundUrl = sounds.options[sounds.selectedIndex].innerText,
-                url = tabs[0].url.split(/[#?]/)[0];
-
-            soundboard.url = url;
-
-            console.log(sounds, key, url, soundRetrigger, tabs[0].url);
-
-            soundboard.mapKey(soundUrl, soundRetrigger, parseInt(startDelay.value));
-
-            message.innerText = 'Press a key to complete mapping';
-
-            // Keymap storage is done in Soundboard class setKeyMapCode()
-
-            //chrome.tabs.sendMessage(tabs[0].id, {type: 'map_key', key: key, delay: parseInt(startDelay.value)}, mapComplete);
-        } else {
-            message.innerText = 'No sounds loaded yet!';
-        }
-
-    });
+    if (isSolo) {
+        mapKeyToUrl(requestedSoundboard);
+    } else {
+        chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+            let url = tabs[0].url.split(/[#?]/)[0];
+            mapKeyToUrl(url);
+        });
+    }
 };
+
+function mapKeyToUrl(url) {
+    if (sounds.options.length > 1) {
+        let key = parseInt(sounds.options[sounds.selectedIndex].value),
+            soundRetrigger = retrigger.checked,
+            soundUrl = sounds.options[sounds.selectedIndex].innerText;
+
+        soundboard.url = url;
+
+        console.log(sounds, key, url, soundRetrigger);
+
+        soundboard.mapKey(soundUrl, soundRetrigger, parseInt(startDelay.value));
+
+        message.innerText = 'Press a key to complete mapping';
+
+        // Keymap storage is done in Soundboard class setKeyMapCode()
+        //chrome.tabs.sendMessage(tabs[0].id, {type: 'map_key', key: key, delay: parseInt(startDelay.value)}, mapComplete);
+    } else {
+        message.innerText = 'No sounds loaded yet!';
+    }
+}
 
 function checkForSounds(force, useUrl) {
     // If we're requesting a soundboard url directly use that, else get it from the current tab
@@ -307,7 +305,7 @@ function loadResources(urls, keyMap) {
     // Check if the first selected sound exists as a Switcher in soundboard.sounds,
     // if not load it with a single channel
     if (typeof soundboard.sounds[urls[0]] === 'undefined') {
-        soundboard.loadSound(urls[0], 1);
+        soundboard.loadSound(urls[0], 1, true);
     }
 }
 

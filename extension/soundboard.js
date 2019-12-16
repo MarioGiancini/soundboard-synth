@@ -26,6 +26,7 @@ class SoundBoard {
     playStartControl;
     playStartDisplay;
     playSampleControl;
+    url;
 
     constructor(numSounds) {
         this.numSounds = numSounds && Number.isInteger(numSounds) ? numSounds : 20;
@@ -75,7 +76,7 @@ class SoundBoard {
                         type: "speed",
                         data: {
                             type: "basic",
-                            iconUrl: "images/get_started128.png",
+                            iconUrl: "images/icon48.png",
                             title: "Sound Speed Increase",
                             message: "Sound speed set to " + soundBoard.speed
                         }, function(response) {
@@ -94,7 +95,7 @@ class SoundBoard {
                         type: "speed",
                         data: {
                             type: "basic",
-                            iconUrl: "images/get_started48.png",
+                            iconUrl: "images/icon48.png",
                             title: "Sound Speed Decrease",
                             message: "Sound speed set to " + soundBoard.speed
                         }, function(response) {
@@ -123,6 +124,7 @@ class SoundBoard {
                     soundBoard.setKeyMapCode(keyCode, keyName);
 
                     key.classList.add('mapped');
+                    key.setAttribute('title', soundBoard.mapSound);
 
                     // load mapped sound
                     soundBoard.loadSound(soundBoard.mapSound, soundBoard.mapRetrigger ? 1 : soundBoard.numSounds);
@@ -134,15 +136,16 @@ class SoundBoard {
 
                     // Show mapping complete
                     soundBoard.message.innerText = 'Mapping complete!';
-                    console.log('Mapping complete. You mapped the ' + keyName + ' key to ' + soundBoard.sounds[soundBoard._keyMap[keyCode].src].src);
-                } else if (typeof soundBoard._keyMap[keyCode] !== 'undefined') {
-                    let sound = soundBoard.sounds[soundBoard._keyMap[keyCode].src],
-                        startOffset = soundBoard._keyMap[keyCode].start;
+                    console.log('Mapping complete. You mapped the ' + keyName + ' key to ' + soundBoard.sounds[soundBoard.keyMap[keyCode].src].src);
+                } else if (typeof soundBoard.keyMap[keyCode] !== 'undefined') {
+                    let sound = soundBoard.sounds[soundBoard.keyMap[keyCode].src],
+                        startOffset = soundBoard.keyMap[keyCode].start;
 
                     sound.currentTime = startOffset && typeof startOffset === 'number' ? (startOffset / 100) * sound.duration : 0;
 
                     soundBoard.play(sound, keyCode);
-                    soundBoard.message.innerText = soundBoard._keyMap[keyCode].src;
+                    // Show file being played in message area, strip any query strings or hashes
+                    soundBoard.message.innerText = soundBoard.keyMap[keyCode].src.split(/[#?]/)[0];
                 }
             }
         };
@@ -178,6 +181,7 @@ class SoundBoard {
                 let mappedKey = document.querySelector('[data-code="' + key + '"]'),
                     map = soundBoard.keyMap[key]; // map has: key, src (url), start, and retrigger
                 mappedKey.classList.add('mapped');
+                mappedKey.setAttribute('title', map.src);
 
                 // load mapped sound
                 soundBoard.loadSound( map.src, map.retrigger ? 1 : soundBoard.numSounds);
@@ -191,7 +195,7 @@ class SoundBoard {
 
     setKeyMapCode(keyCode, keyName) {
         const soundBoard = this;
-        soundBoard._keyMap[keyCode] = {
+        soundBoard.keyMap[keyCode] = {
             key: keyName,
             src: soundBoard.mapSound, // the url of the sound, index/key of sounds object
             start: soundBoard.mapStart ? soundBoard.mapStart : 0,
@@ -199,11 +203,11 @@ class SoundBoard {
         };
 
         const updateSoundboard = {
-            keyMap: soundBoard._keyMap,
+            keyMap: soundBoard.keyMap,
             urls: soundBoard.resources
         };
 
-        console.log('CHECKING KEYMAP', soundBoard._keyMap);
+        console.log('CHECKING KEYMAP', soundBoard.url, soundBoard.keyMap);
 
         // Set the latest version of this soundboard's keymap and resources
         chrome.storage.local.set({[soundBoard.url]: updateSoundboard}, function () {
@@ -258,10 +262,10 @@ class SoundBoard {
     }
 
 
-    loadedResource(src) {
+    loadedResource(src, skipNotify) {
         this.resourcesLoaded++;
         let x = this.resourcesLoaded,
-            y = this.resources.length;
+            y =  Object.keys(this.keyMap).length;
 
         chrome.runtime.sendMessage({
             type: "loading_switcher",
@@ -272,10 +276,13 @@ class SoundBoard {
             }
         });
 
-        console.log('Loading ' + x + ' of ' + y + ' complete.', 'Audio file: ' + src);
+        if (!skipNotify) {
+            this.message.innerText = 'Loading ' + x + ' of ' + y + ' mapped sounds...';
 
-        if (x === y) {
-            console.log('All soundboard resources loaded!');
+            if (x === y) {
+                this.message.innerText = 'Ready...';
+                console.log('All soundboard resources loaded!');
+            }
         }
     }
 
@@ -326,8 +333,8 @@ class SoundBoard {
         });
     }
 
-    loadSound(url, numSounds) {
-        this.sounds[url] = new Switcher(url, this, numSounds);
+    loadSound(url, numSounds, skipNotify) {
+        this.sounds[url] = new Switcher(url, this, numSounds, skipNotify);
     }
 
     repeatSound(url, repeat) {
