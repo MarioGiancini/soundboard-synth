@@ -187,6 +187,10 @@ button.is-primary.is-outlined:focus {
     right: 3px;
 }
 
+.key.num.mapped:before {
+    bottom: -2px;
+}
+
 .key.mapped.tap:before, .key.mapped.tap:after {
     color: var(--primary);
 }
@@ -535,9 +539,14 @@ body.solo {
 }
 
 .solo .panel-block {
-    border: 1px solid var(--gray-300);
+    border-left: 1px solid var(--gray-300);
+    border-right: 1px solid var(--gray-300);
     margin: 0 auto;
     max-width: 800px;
+}
+
+.solo .panel-block:last-child {
+    border-bottom: 1px solid var(--gray-300);
 }
 
 .solo .keyboard {
