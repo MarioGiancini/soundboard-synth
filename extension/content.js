@@ -21,10 +21,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log('LOOK!', request, sender);
 
     if (typeof request.type !== 'undefined' && request.type === 'load') {
-        // let soundboardUrls = checkResources();
-        // // Send sound URLs back to popup to show loading count has start
-        // console.log('Loading sounds:', soundboardUrls);
-        // sendResponse(soundboardUrls);
+
         let resources = window.performance.getEntriesByType("resource");
 
         console.log('checking resources from content.js:', url, resources);
@@ -89,44 +86,3 @@ window.onload = (event) => {
 
     });
 };
-
-
-// var menuItem = {
-//     "id": "spendMoney",
-//     "title": "Spend Money",
-//     "contexts": ["selection"]
-// };
-//
-// chrome.contextMenus.create(menuItem);
-
-
-// chrome.contextMenus.onClicked.addListener(function(clickData){
-//     if (clickData.menuItemId == "spendMoney" && clickData.selectionText){
-//         if (isInt(clickData.selectionText)){
-//             chrome.storage.sync.get(['total','limit'], function(budget){
-//                 var newTotal = 0;
-//                 if (budget.total){
-//                     newTotal += parseInt(budget.total);
-//                 }
-//
-//                 newTotal += parseInt(clickData.selectionText);
-//                 chrome.storage.sync.set({'total': newTotal}, function(){
-//                     if (newTotal >= budget.limit){
-//                         var notifOptions = {
-//                             type: "basic",
-//                             iconUrl: "icon48.png",
-//                             title: "Limit reached!",
-//                             message: "Uh oh, look's like you've reached your alloted limit."
-//                         };
-//                         chrome.notifications.create('limitNotif', notifOptions);
-//
-//                     }
-//                 });
-//             });
-//         }
-//     }
-// });
-//
-// chrome.storage.onChanged.addListener(function(changes, storageName){
-//     chrome.browserAction.setBadgeText({"text": changes.total.newValue.toString()});
-// });

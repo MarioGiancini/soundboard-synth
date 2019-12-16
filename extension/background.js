@@ -10,9 +10,8 @@
 'use strict';
 
 chrome.runtime.onInstalled.addListener(function () {
-    // chrome.storage.local.set({soundboards: {}}, function () {
-    //     console.log('Soundboards installed.');
-    // });
+    // TODO: DO we need to do anything on initial soundboard synth installation?
+    // console.log('Soundboards installed.');
 });
 
 
@@ -51,10 +50,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     return typeof resource !== "undefined" && self.indexOf(resource) === index;
                 });
 
-                // chrome.storage.local.clear(function () {
-                //     console.log('Soundboards Cleared.');
-                // });
-
                 let storeSoundboard = {
                     urls: allUrls,
                     keyMap: keyMap
@@ -72,17 +67,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
             });
 
-
         } else {
             chrome.browserAction.setBadgeText({"text": ""});
         }
 
     }
-    // else if (request.type === "speed") {
-    //     console.log('speed notification called', request);
-    //     chrome.notifications.clear('speed');
-    //     chrome.notifications.create('speed', request.data, function(notificationId) { console.log('Notification sent!', notificationId)});
-    // }
 });
 
 
@@ -106,20 +95,10 @@ chrome.tabs.onActivated.addListener(function (tab) {
 
     });
 
-    // Should check for existing soundboard urls based on url and update badge
+    // TODO: Should check for existing soundboard urls based on url and update badge
 });
 
 // When the user clicks on the extension icon
 chrome.browserAction.onClicked.addListener(function (tab) {
-    // const numSounds = 20;
-    // const sBoard = new SoundBoard(numSounds);
     console.log('Soundboard opened!', tab);
-
-    // Get array of current sound files by unique url
-    // chrome.storage.local.get([request.url], function(result) {
-    //     console.log('Soundboard currently is ', result.soundboards);
-    //     soundboards = result.soundboards;
-    // });
 });
-
-
