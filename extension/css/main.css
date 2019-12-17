@@ -39,14 +39,16 @@
 }
 
 .panel.is-primary .panel-heading .app-title {
+    align-items: center;
+    display: flex;
     flex: 1;
     font-weight: 300;
     letter-spacing: 10px;
     text-transform: uppercase;
 }
 
-.panel.is-primary .panel-heading .app-title i {
-    margin-right: 5px;
+.panel.is-primary .panel-heading .app-title svg {
+    margin-right: 20px;
 }
 
 .panel.is-primary .panel-heading .app-version {
