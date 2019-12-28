@@ -4,4 +4,4 @@ out
 gen
 .DS_Store
 .env
-.zip
+*.zip
