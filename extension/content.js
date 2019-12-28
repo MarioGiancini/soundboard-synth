@@ -18,13 +18,10 @@ function filterResource(resource) {
 // Background should update the extension badge to show number available
 // Then badge can be clicked to do a browser action to load all Audio objects into a soundboard
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log('LOOK!', request, sender);
 
     if (typeof request.type !== 'undefined' && request.type === 'load') {
 
         let resources = window.performance.getEntriesByType("resource");
-
-        console.log('checking resources from content.js:', url, resources);
 
         // Parse the active window resources
         Promise.all(resources
@@ -35,7 +32,29 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 return typeof resource !== "undefined" && self.indexOf(resource) === index;
             })
         ).then(soundboardUrls => {
-            console.log('Found sounds', soundboardUrls);
+            // Now look through any audio element sources if available
+            const audios = document.getElementsByTagName('audio');
+            let audioUrls = [];
+            for (let a = 0; a < audios.length; a++) {
+                let soundUrl = '';
+                // First check audio element for src attribute
+                if (audios[a].src) {
+                    soundUrl = audios[a].src;
+                } else {
+                    // if no src then check for <source> element
+                    let sources = audios[a].getElementsByTagName('source');
+                    soundUrl = sources[0] !== undefined ? sources[0].src : soundUrl;
+                }
+
+                if (soundUrl) {
+                    audioUrls.push(soundUrl)
+                }
+            }
+
+            // Now merge any found audio element sounds with Resource sounds
+            soundboardUrls = soundboardUrls.concat(audioUrls).filter(function (resource, index, self) {
+                return typeof resource !== "undefined" && self.indexOf(resource) === index;
+            });
 
             // send message to background to update badge and storage value
             chrome.runtime.sendMessage({
@@ -44,13 +63,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 url: url,
                 urls: soundboardUrls
             }, function (response) {
+                // TODO: Key maps are pulled from popup.js now so may not need this
                 if (response && typeof response.keyMap !== 'undefined') {
                     chrome.runtime.sendMessage({
                         type: 'map_keys',
                         keyMap: response.keyMap
                     });
-                } else {
-                    console.log('Could not do key mapping from storage', response);
                 }
             });
 
@@ -64,6 +82,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 });
 
+// TODO: Do we need to increase resource buffer size?
+// window.performance.setResourceTimingBufferSize(1000);
+
 window.onload = (event) => {
     // Attempt to check resources on initial page load
     Promise.all(window.performance.getEntriesByType("resource")
@@ -74,7 +95,31 @@ window.onload = (event) => {
             return typeof resource !== "undefined" && self.indexOf(resource) === index;
         })
     ).then(soundboardUrls => {
-        console.log('Doing initial sound check', soundboardUrls);
+        // Now look through any audio element sources if available
+        const audios = document.getElementsByTagName('audio');
+        let audioUrls = [];
+        for (let a = 0; a < audios.length; a++) {
+            let soundUrl = '';
+            // First check audio element for src attribute
+            if (audios[a].src) {
+                soundUrl = audios[a].src;
+            } else {
+                // if no src then check for <source> element
+                let sources = audios[a].getElementsByTagName('source');
+                soundUrl = sources[0] !== undefined ? sources[0].src : soundUrl;
+            }
+
+            if (soundUrl) {
+                audioUrls.push(soundUrl)
+            }
+        }
+
+        // Now merge any found audio element sounds with Resource sounds
+        soundboardUrls = soundboardUrls.concat(audioUrls).filter(function (resource, index, self) {
+            return typeof resource !== "undefined" && self.indexOf(resource) === index;
+        });
+
+        console.log('Soundboard Synth initial sound check found this many sounds:', soundboardUrls.length);
 
         // send message to background to update badge and storage value
         chrome.runtime.sendMessage({
