@@ -9,6 +9,7 @@ class SoundBoard {
     controls = {};
     _volume = 1;
     _resources = [];
+    _resourceParams = {};
     resourcesLoaded = 0;
     loaded;
     randomSessions = {};
@@ -251,6 +252,14 @@ class SoundBoard {
 
     get resources() {
         return this._resources;
+    }
+
+    set resourceParams(params) {
+        this._resourceParams = params;
+    }
+
+    get resourceParams() {
+        return this._resourceParams;
     }
 
     loadMappedKey(key, keyCode) {

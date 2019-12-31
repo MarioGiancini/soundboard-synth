@@ -10,6 +10,8 @@ class Switcher {
     soundBoard; // instance of SoundBoard
     skipOnLoad; // skip notify when the Switcher is fully loaded
     src;
+    params; // any url query params to append to the source
+    fullUrl; // the src plus any query params encoded
 
     constructor(src, soundBoard, channels, skipOnLoad) {
         this.channels = [];
@@ -20,12 +22,19 @@ class Switcher {
         this.soundBoard = soundBoard;
         this.playbackRate = 1; // needs to be after soundBoard since we check it
         this.src = src;
+        this.params = typeof this.soundBoard.resourceParams[this.src] === 'object' ? this.soundBoard.resourceParams[this.src] : {};
         this.skipOnLoad = !!skipOnLoad;
 
         let switcher = this;
 
+        let queryString = Object.keys(this.params).map((key) => {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(this.params[key])
+        }).join('&');
+
+        this.fullUrl = this.src + (queryString ? '?' + queryString : '');
+
         for (let i = 0; i < this.num; i++) {
-            let audio = new Audio(src);
+            let audio = new Audio(this.fullUrl);
             audio.addEventListener('loadedmetadata', function(e) {
                 switcher.checkLoaded();
                 if (!i) {
