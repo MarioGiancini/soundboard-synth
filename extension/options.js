@@ -118,26 +118,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
             tr.setAttribute('data-url', page);
 
-            // Loop through each pages key map and sound files
-            Object.keys(items[page]).forEach(function (item, x) {
+            // Check if this page has a key map
+            if (typeof items[page].keyMap !== 'undefined' && Object.keys(items[page].keyMap).length) {
+                hasKeyMap = true;
+            }
 
-                if (item === 'keyMap' && Object.keys(items[page][item]).length) {
-                    hasKeyMap = true;
-                }
+            // Check if there's sound files and use full URL
+            if (typeof items[page].urls !== 'undefined' && items[page].urls.length) {
+                let pageUrls = items[page].urls,
+                    numSounds = items[page].urls.length,
+                    title = numSounds + ' Sound' + (numSounds > 1 ? 's' : '');
 
-                if (item === 'urls' && items[page][item].length) {
-                    let numSounds = items[page][item].length;
-                    let title = numSounds + ' Sound' + (numSounds > 1 ? 's' : '');
-                    dropDown = createDropDown(title, index, items[page][item], true);
+                // Check if there are url params stored and combine into full URLs
+                // in case we need to access protected resources, etc
+                if (typeof items[page].params !== 'undefined' && items[page].params.length) {
+                    console.log('Have some params to append on', items[page], items[page].params);
+                    pageUrls = items[page].urls.map(item => {
+                        let queryString = Object.keys(items[page].params).map(key => {
+                            return encodeURIComponent(key) + '=' + encodeURIComponent(this.params[key])
+                        }).join('&');
+
+                        return item + '?' + queryString;
+                    });
                 }
-            });
+                // Create the dropdown from the URLs
+                dropDown = createDropDown(title, index, pageUrls, true);
+            }
 
             // Build table row
             th.innerHTML = '<a href="' + page + '" target="_blank">' + page + '</a>';
 
             // Build soundboard solo button
-            //
-            // Build export button
             soloPlayButton.classList.add('button', 'solo');
             soloPlayButton.setAttribute('title', 'Play Soundboard by Itself');
             soloPlayButton.innerHTML = '<i class="fas fa-play"></i>';
