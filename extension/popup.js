@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
     // Check if we already have sound urls stored, but delay enough to let popup.html show
     setTimeout( function () {
         if (isSolo && requestedSoundboard) {
+            // Loading in solo play, use soundboard URL
             checkForSounds(false, requestedSoundboard)
         } else {
             checkForSounds();
@@ -257,7 +258,6 @@ function checkForSounds(force, useUrl) {
 
 function showResources(response) {
     const resources = document.getElementById('message');
-    const sounds = document.getElementById('sounds');``
     let message = "No audio files found. Try reloading the page or extension.";
 
     console.log('SHOW RESOURCES', response);
@@ -265,23 +265,22 @@ function showResources(response) {
     if (response && typeof response[soundboard.url] !== "undefined" && typeof response[soundboard.url].urls !== "undefined" && response[soundboard.url].urls.length) {
         message = "Loading " + response[soundboard.url].urls.length + " sound files...";
 
-        loadResources(response[soundboard.url].urls, response[soundboard.url].keyMap);
+        loadResources(response[soundboard.url].urls, response[soundboard.url].params, response[soundboard.url].keyMap);
 
     } else if (response && typeof response.type !== 'undefined' && response.type === 'initialize') {
         // initial load of page shouldn't have stored key maps
-        loadResources(response.urls, false)
+        loadResources(response.urls, response.params, false)
     } else {
         resources.textContent = message;
     }
-
-
-    console.log('Response', response);
 }
 
-function loadResources(urls, keyMap) {
+function loadResources(urls, params, keyMap) {
     const resources = document.getElementById('message');
     const sounds = document.getElementById('sounds');
     let message = "No audio files found. Try reloading the page or extension.";
+
+    console.log('Loading Resources into popup');
 
     // reset all exist options
     sounds.innerHTML = '<option value="" disabled>Select A Sound</option>';
@@ -294,13 +293,17 @@ function loadResources(urls, keyMap) {
         sounds.appendChild(option);
     });
 
-    // Set stored key map
+    soundboard.resources = urls;
+    // soundboard.loadSounds();
+
+    if (typeof params === 'object') {
+        soundboard.resourceParams = params;
+    }
+
+    // Set stored key map after urls and params are set
     if (keyMap && typeof keyMap === 'object') {
         soundboard.keyMap = keyMap;
     }
-
-    soundboard.setResources(urls);
-    // soundboard.loadSounds();
 
     // Check if the first selected sound exists as a Switcher in soundboard.sounds,
     // if not load it with a single channel

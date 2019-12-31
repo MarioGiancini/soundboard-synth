@@ -14,7 +14,9 @@ chrome.runtime.onInstalled.addListener(function () {
     // console.log('Soundboards installed.');
 });
 
-
+/**
+ * Here's where merging of found sounds and stored sounds happens, then store updated sounds
+ */
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     // use local for now to debug, then change to sync
 
@@ -52,7 +54,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
                 let storeSoundboard = {
                     urls: allUrls,
-                    keyMap: keyMap
+                    keyMap: keyMap,
+                    params: request.params // always store updated params since these could change
                 };
 
                 chrome.storage.local.set({[request.url]: storeSoundboard}, function () {
